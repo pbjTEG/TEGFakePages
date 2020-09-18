@@ -1,0 +1,34 @@
+/* TQPages
+ * Baseline styles for pagination.
+ *
+ * Copyright 2020, PMG / The Production Management Group, Ltd.
+ * Released under the MIT license.
+ *
+ * The Engage Group <engage@engageyourcause.com>
+ */
+
+/* hide pages */
+section[id^="step"] {
+	display: none;
+}
+
+section[id^="step"].current {
+	display: block;
+}
+
+.step-nav {
+	margin: 10pt 0 10pt;
+}
+
+@media screen and (min-width: 800px) {
+	.step-next,
+	input[type="submit"] {
+		float: right;
+	}
+
+	.step-nav::after {
+		clear: both;
+		content: ' ';
+		display: block;
+	}
+}
