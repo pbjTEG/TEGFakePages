@@ -20,6 +20,19 @@ section[id^="step"].current {
 	margin: 10pt 0 10pt;
 }
 
+div[data-visited="true"] {
+	background: lightgray;
+	cursor: pointer;
+}
+
+div[data-visited="true"].current {
+	background: white;
+}
+
+div.col.title.current {
+	border: 1px solid black;
+}
+
 @media screen and (min-width: 800px) {
 	.step-next,
 	input[type="submit"] {

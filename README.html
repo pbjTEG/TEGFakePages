@@ -1,0 +1,384 @@
+<!--
+  ~ Copyright (c) 2020. The Production Management Group, Ltd.
+  -->
+<!DOCTYPE html><!--suppress JSUnresolvedLibraryURL -->
+<html lang="en">
+<head>
+	<title>TEG Fake Pages</title>
+	<meta charset="UTF-8" />
+	<meta name="keywords" content="javascript, library, quiz, trivia, form" />
+	<meta name="description" content="Creates additional HTML structure and adds functionality to fake pagination of a single page's content." />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<style>
+		body {
+			background: white;
+			margin: 0 auto;
+			max-width: 60rem;
+		}
+
+		td {
+			padding: 4pt;
+			vertical-align: top;
+		}
+
+		pre {
+			font-size: smaller;
+			max-width: 800px;
+			overflow: auto;
+		}
+
+		td[colspan] > pre.prettyprint.lang-javascript.prettyprinted {
+			max-width: 100%;
+		}
+
+		td > pre.prettyprint.lang-javascript.prettyprinted {
+			max-width: 20rem;
+			padding: .5rem;
+		}
+
+		tr:nth-child(odd) {
+			background: lightgray;
+		}
+
+		tr:nth-child(odd) td[colspan] {
+			background: white;
+		}
+
+		dt {
+			margin-top: 10pt;
+		}
+	</style>
+	<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
+</head>
+<body>
+<h1>TEG Fake Pages</h1>
+<p>Collects portions of page content into &quot;pages&quot; and generates navigation to show those pages sequentially. The library also provides hooks to perform per-page validation and halt navigation if necessary.</p>
+<h2>Requires</h2>
+<ul>
+	<li>jQuery 3.5.1</li>
+	<li>jQuery Debounce by Dimitry Filatov</li>
+	<li><a href="https://bitbucket.org/engagegroup/teg-jquery-utilities/src/v2/">TEG jQuery Utilities v2</a></li>
+</ul>
+<h2>Recommended</h2>
+<ul>
+	<li>Bootstrap Grid (required for default content options)</li>
+</ul>
+<h2>Provided</h2>
+<dl>
+	<dt>TEGFakePages.js</dt>
+	<dd>Creates additional HTML structure and adds JavaScript powered navigation between pages.</dd>
+	<dt>TEGFakePages.css</dt>
+	<dd>Baseline styles necessary to make the page swapping work.</dd>
+</dl>
+<h2>Installation</h2>
+<p>Link the styles and JavaScript in the <code class="prettyprint lang-javascript">&lt;head&gt;</code> element of the page.</p>
+<pre class="prettyprint lang-html">
+   &lt;link rel="stylesheet" href="https://foo.bar.com/path/to/files/TEGFakePages.css" />
+   &lt;script src="https://foo.bar.com/path/to/files/jquery-3.5.0.min.js" type="text/javascript">&lt;/script>
+   &lt;script src="https://foo.bar.com/path/to/files/TEGUtilities.js" type="text/javascript">&lt;/script>
+   &lt;script src="https://foo.bar.com/path/to/files/TEGFakePages.js" type="text/javascript">&lt;/script>
+</pre>
+<p>Initialize the pagination in a <code class="prettyprint lang-javascript">script</code> element or
+	<code class="prettyprint lang-javascript">.js</code> file. See
+	<code class="prettyprint lang-javascript"><a href="#Options">options</a></code> below.
+</p>
+<pre class="prettyprint lang-html">
+   &lt;script>
+	   window.thesePages = new TEGFakePages(<em>{options}</em>);
+   &lt;/script>
+</pre>
+<h2>Properties</h2>
+<dl>
+	<dt>options</dt>
+	<dd>Collection of configuration options.See
+		<code class="prettyprint lang-javascript"><a href="#Options">options</a></code> below.
+	</dd>
+	<dt>form</dt>
+	<dd>A jQuery object referencing the &ldquot;form&rdquot; on the page. While this library was designed for paginating lengthy forms, it can be used on any content. If <a href="#breadcrumbs" class="prettyprint lang-javascript">breadcrumbs</a> are defined, they will be prepended to this HTML element. See the
+		<a href="#formSelector">formSelector</a> option below.
+	</dd>
+	<dt>document</dt>
+	<dd>A jQuery object referencing the HTML document. This and the form property above are provided with the hope that running
+		<code class="prettyprint lang-javascript">$.fn.find()</code> is slightly faster than creating a new jQuey object.
+	</dd>
+	<dt>args</dt>
+	<dd>A collection containing the query string parameters. Each parameter name is a key and each value is scrubbed of
+		<code class="prettyprint lang-javascript">&lt;</code> characters to help defend against HTML injection. If HTML injection is required, a custom function must be created to decode or re-code the HTML value and insert it.
+	</dd>
+	<dt>currentPageNumber</dt>
+	<dd>The current page number used to track the user&rdquo;s location in the lsit of pages. When the page is loaded, this will be set to the value of
+		<code class="prettyprint lang-javascript">options.currentPageNumber</code> which can allow the user to start in the middle.
+		<strong>NOTE: This is a page number and not an array offset. Page numbers start at 1.</strong></dd>
+	<dt>lastPageNumber</dt>
+	<dd>The number of the last page in the list. This is set by counting the number of pages generated while scanning the content. See
+		<code class="prettyprint lang-javascript">option.pageStartSelector</code> below.
+		<strong>NOTE: This is a page number and not an array offset. Page numbers start at 1.</strong></dd>
+	<dt>pageObjects</dt>
+	<dd>A jQuery object containing the page structure generated.</dd>
+	<dt>currentPageObject</dt>
+	<dd>A jQuery object containing the cureently viewed page.</dd>
+</dl>
+<h2 id="Options">Options</h2>
+<table>
+	<thead>
+	<tr>
+		<th>
+			Option
+		</th>
+		<th>
+			Type
+		</th>
+		<th>
+			Default
+		</th>
+		<th>
+			Description
+		</th>
+	</tr>
+	</thead>
+	<tbody>
+	<tr>
+		<td id="formSelector">formSelector</td>
+		<td>string</td>
+		<td><code class="prettyprint lang-javascript">'form'</code></td>
+		<td>CSS selector identifying the innermost HTML element which contains all of the paginated content.</td>
+	</tr>
+	<tr>
+		<td>currentPageNumber</td>
+		<td>number</td>
+		<td><code class="prettyprint lang-javascript">1</code></td>
+		<td>Enable the form to start in the middle after a reload.</td>
+	</tr>
+	<tr>
+		<td>currentPageClass</td>
+		<td>string</td>
+		<td><code class="prettyprint lang-javascript">'current'</code></td>
+		<td>CSS class to apply to the current page.</td>
+	</tr>
+	<tr>
+		<td id="pageStartSelector">pageStartSelector</td>
+		<td>string</td>
+		<td><code class="prettyprint lang-javascript">'.step'</code></td>
+		<td>CSS selector identifying the start of a fake page.</td>
+	</tr>
+	<tr>
+		<td>pageExcludeSelector</td>
+		<td>string</td>
+		<td><code class="prettyprint lang-javascript">'.step-exclude'</code></td>
+		<td>CSS selector identifying items that should not be included in the fake page structure. This will, incidentally, mark the end of a page.</td>
+	</tr>
+	<tr>
+		<td>pageItemClass</td>
+		<td>string</td>
+		<td><code class="prettyprint lang-javascript">'step-item'</code></td>
+		<td>CSS class to be added to the <code class="prettyprint lang-javascript">&lt;section /></code> element which defines each page.</code></td>
+	</tr>
+	<tr>
+		<td>pageItemParentSelector</td>
+		<td>string</td>
+		<td><code class="prettyprint lang-javascript">'parent'</code></td>
+		<td>CSS selector identifying a parent of the HTML element defined by
+			<code class="prettyprint lang-javascript"><a href="#pageStartSelector">pageStartSelector</a></code>. On content management systems (CMS), there will be rather a lot of additional HTML. The CMS will generate some repeating container element for all the blocks of HTML which must appear on each fake page. This additional HTML likely needs to be kept with the content defined by the client in order for the CMS to continue proper function. The
+			<code class="prettyprint lang-javascript">&lt;section /></code> element which defines each page will be wrapped around the various sibling elements identified by this selector.
+		</td>
+	</tr>
+	<tr>
+		<td>pageIDPrefix</td>
+		<td>string</td>
+		<td><code class="prettyprint lang-javascript">'step'</code></td>
+		<td>First part of the ID of each page. This string will be appended with the page number to make the ID unique.</td>
+	</tr>
+	<tr>
+		<td>errorSelector</td>
+		<td>string</td>
+		<td><code class="prettyprint lang-javascript">'error'</code></td>
+		<td>CSS selector of error messages that may appear on the page. If any are visible, the user will not be allowed to go forward to the next page.</td>
+	</tr>
+	<tr>
+		<td>submitSelector</td>
+		<td>string</td>
+		<td><code class="prettyprint lang-javascript">'[type="submit"]'</code></td>
+		<td>CSS selector of the submit button for the form. The HTML element found will define the end of the pagination.</td>
+	</tr>
+	<tr>
+		<td id="breadcrumbs">breadcrumbs</td>
+		<td>jQuery object</td>
+		<td><code class="prettyprint lang-javascript">jQuery('&lt;div class="row">&lt;/div>')</code></td>
+		<td>jQuery object containing the model HTML for a row of breadcrumb naviation. If this is empty, no breadcrumbs will be created.</td>
+	</tr>
+	<tr>
+		<td>breadcrumbItemMobile</td>
+		<td>jQuery object</td>
+		<td>
+<pre class="prettyprint lang-javascript">
+jQuery('&lt;div class="row">&lt;/div>')
+   .append('&lt;div class="col-2 previous">&nbsp;&lt;/div>')
+   .append('&lt;div class="col title" />')
+   .append('&lt;div class="col-2 next">&nbsp;&lt;/div>')
+</pre>
+		</td>
+		<td>jQuery object containing the model HTML for a single breadrumb item for mobile phones. The visible HTML will be inserted in the innermost HTML element of this object.</td>
+	</tr>
+	<tr>
+		<td>breadcrumbItemTablet</td>
+		<td>jQuery object</td>
+		<td><code class="prettyprint lang-javascript">jQuery('&lt;div class="col title">&lt;/div>')</code></td>
+		<td>jQuery object containing the model HTML for a single breadrumb item for tablets.< The visible HTML will be inserted in the innermost HTML element of this object./td>
+	</tr>
+	<tr>
+		<td>breadcrumbItemDesktop</td>
+		<td>jQuery object</td>
+		<td><code class="prettyprint lang-javascript">jQuery('&lt;div class="col title">&lt;/div>')</code></td>
+		<td>jQuery object containing the model HTML for a single breadrumb item for desktop computers. The visible HTML will be inserted in the innermost HTML element of this object.</td>
+	</tr>
+	<tr>
+		<td colspan="4">
+			<p>Any HTML element in a <code class="prettyprint lang-javascript">breadcrumbItem*</code> object will be filled with the HTML content of the item defined by
+				<code class="prettyprint lang-javascript"><a href="#pageStartSelector">pageStartSelector</a></code>. With the default settings for example:
+			</p>
+			<pre class="prettyprint lang-javascript">
+&lt;h1 class='.step'>User Info&lt;span class="desktopView">rmation&lt;/span>&lt;/h1>
+</pre>
+			<p>will generate the breadcrumb</p>
+			<pre class="prettyprint lang-javascript">
+&lt;div class="col title">User Info&lt;span class="desktopView">rmation&lt;/span>&lt;/h1>
+</pre>
+			<p>If the item defined by
+				<code class="prettyprint lang-javascript"><a href="#pageStartSelector">pageStartSelector</a></code> has the attribute data-breadcrumb, then the value of that attribute will be rendered in the breadcrumb item. With the default settings for example:
+			</p>
+			<pre class="prettyprint lang-javascript">
+&lt;h1 class='.step' data-breadcrumb="User Info">User Information&lt;h1>
+</pre>
+			<p>will generate the breadcrumb</p>
+			<pre class="prettyprint lang-javascript">
+&lt;div class="col title">User Info&lt;/div>
+</pre>
+		</td>
+	</tr>
+	<!-- reset the odd-even count after a full collspan -->
+	<tr></tr>
+	<tr>
+		<td>pageButtons</td>
+		<td>jQuery object</td>
+		<td><code class="prettyprint lang-javascript">jQuery('&lt;div class="step-nav"/>')</code></td>
+		<td>jQuery object containing the outer structure of the navigation buttons for the pages. This will be cloned and inserted at the bottom of each page. On the last page, it will be wrapped around the form submit button.</td>
+	</tr>
+	<tr>
+		<td>backButton</td>
+		<td>jQuery object</td>
+		<td><code class="prettyprint lang-javascript">jQuery('&lt;button class="step-back">Back&lt;/button>')</code></td>
+		<td>jQuery object containing a navigation button for the pages. This will be cloned and inserted inside a clone of
+			<code class="prettyprint lang-javascript">pageButtons</code>. This button will not be present on the first page.
+		</td>
+	</tr>
+	<tr>
+		<td>continueButton</td>
+		<td>jQuery object</td>
+		<td><code class="prettyprint lang-javascript">jQuery('&lt;button class="step-next">Continue&lt;/button>')</code></td>
+		<td>jQuery objcet containing a navigation button for the pages. This will be cloned and inserted inside a clone of
+			<code class="prettyprint lang-javascript">pageButtons</code>. This button will not be present on the last page.
+		</td>
+	</tr>
+	<tr>
+		<td id="pageCallbacks">pageCallbacks</td>
+		<td>collection of functions</td>
+		<td>
+<pre class="prettyprint lang-javascript">
+{
+   '1': {
+      beforeShow: function(pageNumber, pageObject) {
+         /* take some action before the page
+         * appears and/or skip to the next page
+         * by returning false
+         */
+
+         if (console) {
+            console.log('beforeLoad default\n' +
+                        'pageNumber = ' + pageNumber + '\n' +
+                        'pageObject = ' + jQuery(pageObject).class + '\n');
+         }
+         return true;
+      },
+      beforeHide: function(pageNumber, pageObject) {
+         /* take some action before the page
+         * disappears and/or prevent the user
+         * from leaving the page by returning false
+         */
+
+         if (console) {
+            console.log('beforeHide default\n' +
+                        'pageNumber = ' + pageNumber + '\n' +
+                        'pageObject = ' + jQuery(pageObject).prop('nodeName') + '\n' +
+                        '   ID      = ' + jQuery(pageObject).attr('id') + '\n' +
+                        '   class      = ' + jQuery(pageObject).attr('class') + '\n');
+         }
+         return true;
+      },
+   },
+},
+</pre>
+		</td>
+		<td>Some customizations might need to re-render each time the page appears. This object allows a custom installation to define those callbacks. The key for each entry in the collection should be the page number for which the functions will be called. NOTE: these aren't really callbacks. I need a better name.</td>
+	</tr>
+	<tr>
+		<td>pageCallbacks['n'].beforeShow</td>
+		<td>function</td>
+		<td>See <a href="#pageCallbacks">pageCallbacks</a> above.</td>
+		<td>Before the page is shown, this function will be called.</td>
+	</tr>
+	<tr>
+		<td>pageCallbacks['n'].beforeHide</td>
+		<td>function</td>
+		<td>See <a href="#pageCallbacks">pageCallbacks</a> above.</td>
+		<td>Before the page is hidden, this function will be called.</td>
+	</tr>
+	<tr>
+		<td>windowSizeOptions</td>
+		<td>collection</td>
+		<td>
+<pre class="prettyprint lang-javascript">
+{
+   /* mobileMaxWidth : 600,
+    * tabletMinWidth : 599,
+    * tabletMaxWidth : 961,
+    * desktopMinWidth: 968,
+    * tallMinHeight  : 820,
+    * afterWindowSize : function() {},
+    */
+},
+</pre>
+		</td>
+		<td>If <a href="https://bitbucket.org/engagegroup/teg-jquery-utilities/src/v2/README.md">TEG jQuery Utilities</a> is loaded, this collection will be fed to
+			<code class="prettyprint lang-javascript">$.windowSize</code>. See the
+			<a href="https://bitbucket.org/engagegroup/teg-jquery-utilities/src/v2/README.md">documentation for
+				<code class="prettyprint lang-javascript">$.windowSize</code></a> for further information.
+		</td>
+	</tr>
+	<tr>
+		<td>afterLoad</td>
+		<td>function</td>
+		<td>
+<pre class="prettyprint lang-javascript">
+function() {
+   return false;
+}
+</pre>
+		</td>
+		<td>After all else (mostly), this function will run. Anything that needs to happen after setup but before the page is revealed should be defined here.</td>
+	</tr>
+	</tbody>
+</table>
+<h2 id="Methods">Methods</h2>
+<dl>
+	<dt><code class="prettyprint lang-javascript">goPage(page, <em>runValidation</em>)</code></dt>
+	<dd>Accepts a page number and optional flag to engage per-page validation (should any be configured). If the validation passes or
+		<code class="prettyprint lang-javascript">runValidation</code> is false, the current page will be hidden and the page indicated by
+		<code class="prettyprint lang-javascript">page</code> will be shown. See <a href="#pageCallbacks"><code class="prettyprint lang-javascript">pageCallbacks</code></a> above.
+	</dd>
+	<dt><code class="prettyprint lang-javascript">nextPage()</code></dt>
+	<dd>If the user is not viewing the last page, this will call <code class="prettyprint lang-javascript">goPage()</code> to navigate to the next page.</dd>
+	<dt><code class="prettyprint lang-javascript">previousPage()</code></dt>
+	<dd>If the user is not viewing the first page, this will call <code class="prettyprint lang-javascript">goPage()</code> to navigate to the previous page.</dd>
+</dl>
+</body>
+</html>

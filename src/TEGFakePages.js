@@ -16,11 +16,10 @@ function TEGFakePages(Options) {
 		// track the current page number
 		currentPageNumber     : 1, // enable the form to start in the middle after a reload
 		currentPageClass      : 'current',
-		pageBlock             : jQuery('<div/>'),
 		pageStartSelector     : '.step', // start of a fake page
 		pageExcludeSelector   : '.step-exclude', // don't include in fake page structure
 		pageItemClass         : 'step-item',
-		pageItemParentSelector: 'parent', // find the parent element of the start of the page
+		pageItemParentSelector: '', // find the parent element of the start of the page
 		pageIDPrefix          : 'step',
 		errorSelector         : 'error',
 		submitSelector        : '[type="submit"]',
@@ -277,7 +276,8 @@ function TEGFakePages(Options) {
 				TEGFakePages
 					.options
 					.breadcrumbs
-					.append(thisCrumb);
+					.append(thisCrumb)
+					.prependTo(TEGFakePages.form);
 			} // end breadcrumbs
 
 			// if we're adding page buttons
