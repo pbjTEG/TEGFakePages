@@ -6,6 +6,9 @@
  *
  * The Engage Group <engage@engageyourcause.com>
  */
+
+//TODO add generic per-page validation
+
 function TEGFakePages(Options) {
 	var TEGFakePages = this;
 
@@ -163,7 +166,7 @@ function TEGFakePages(Options) {
 	} else {
 
 		if (console) {
-			console.log('TEGFakePages Error: Refusing to load without TEGUtilities.');
+			console.error('TEGFakePages: Refusing to load without TEGUtilities.');
 		}
 		return false;
 	}
