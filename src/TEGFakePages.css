@@ -33,7 +33,19 @@ div.col.title.current {
 	border: 1px solid black;
 }
 
+/* We do a lot of Engaging Networks customization. */
+.en__field__error,
+.en__errorList {
+	color: red;
+}
+
 @media screen and (min-width: 800px) {
+	/* We do a lot of Engaging Networks customization. */
+	div.en__submit {
+		display: inline-block;
+		float: right;
+	}
+
 	.step-next,
 	input[type="submit"] {
 		float: right;

@@ -62,46 +62,47 @@ function TEGFakePages(Options) {
 		breadcrumbItemDesktop: jQuery('<div class="col title"></div>'),
 
 		// page button navigation
-		pageButtons     : jQuery('<div class="step-nav"/>'),
-		backButton      : jQuery('<button class="step-back">Back</button>'),
-		continueButton  : jQuery('<button class="step-next">Continue</button>'),
+		pageButtons   : jQuery('<div class="step-nav"/>'),
+		backButton    : jQuery('<button class="step-back">Back</button>'),
+		continueButton: jQuery('<button class="step-next">Continue</button>'),
 
 		/* Some customizations might need to re-render each
 		 * time the page appears. This object allows a custom
 		 * installation to define those callbacks.
 		 */
 		pageCallbacks: {
-			'1': {
-				beforeShow: function(pageNumber, pageObject) {
-					/* take some action before the page
+			/*
+			 '1': {
+				 beforeShow: function(pageNumber, pageObject) {
+					 /!* take some action before the page
 					 * appears and/or skip to the next page
 					 * by returning false
-					 */
+					 *!/
 
-					if (console) {
-						console.log('beforeLoad default\n' +
-						            'pageNumber = ' + pageNumber + '\n' +
-						            'pageObject = ' + jQuery(pageObject).class + '\n');
-					}
-					return true;
-				},
-				beforeHide: function(pageNumber, pageObject) {
-					/* take some action before the page
+					 if (console) {
+						 console.log('beforeLoad default\n' +
+						 'pageNumber = ' + pageNumber + '\n' +
+						 'pageObject = ' + jQuery(pageObject).class + '\n');
+					 }
+					 return true;
+				 }, // end beforeShow()
+			 beforeHide: function(pageNumber, pageObject) {
+					 /!* take some action before the page
 					 * disappears and/or prevent the user
 					 * from leaving the page by returning false
-					 */
+					 *!/
 
-					if (console) {
-						console.log('beforeHide default\n' +
-						            'pageNumber = ' + pageNumber + '\n' +
-						            'pageObject = ' + jQuery(pageObject).prop('nodeName') + '\n' +
-						            '   ID      = ' + jQuery(pageObject).attr('id') + '\n' +
-						            '   class      = ' + jQuery(pageObject).attr('class') + '\n');
-					}
-					return true;
-				},
-			},
-		},
+					 if (console) {
+						 console.log('beforeHide default\n' +
+						 'pageNumber = ' + pageNumber + '\n' +
+						 'pageObject = ' + jQuery(pageObject).prop('nodeName') + '\n' +
+						 '   ID      = ' + jQuery(pageObject).attr('id') + '\n' +
+						 '   class      = ' + jQuery(pageObject).attr('class') + '\n');
+					 }
+					 return true;
+				 }, // end beforeHide()
+			 */
+		}, // end pageCallbacks()
 
 		// preferred window sizes can be set here
 		windowSizeOptions: {
@@ -377,7 +378,6 @@ function TEGFakePages(Options) {
 	/* Start at the specified page number and use
 	 * an "internal" variable for the page counter.
 	 */
-
 	TEGFakePages.goPage = function(page, runValidation) {
 		var validate = false; // default to no validation
 
@@ -404,7 +404,7 @@ function TEGFakePages(Options) {
 			}
 		}
 
-		// if there are any errors from Engaging Networks field validation
+		// if there are any errors from a CMS's field validation
 		if (TEGFakePages.currentPageObject.find(TEGFakePages.options.errorSelector).is(':visible')) {
 			return false;
 		}
@@ -451,10 +451,14 @@ function TEGFakePages(Options) {
 		// mark the current page for CSS styles
 		TEGFakePages.pageObjects.removeClass(TEGFakePages.options.currentPageClass);
 		TEGFakePages.currentPageObject.addClass(TEGFakePages.options.currentPageClass);
-		// clear any remnant error notices
-		TEGFakePages.currentPageObject
-		            .find(TEGFakePages.options.errorSelector)
-		            .hide();
+
+		// if we validated the page
+		if (validate) {
+			// clear any remnant error notices
+			TEGFakePages.currentPageObject
+			            .find(TEGFakePages.options.errorSelector)
+			            .hide();
+		} // end if we validated
 
 		// highlight correct breadcrumb and mark as visited
 		TEGFakePages
@@ -493,7 +497,7 @@ function TEGFakePages(Options) {
 			} // end if breadcrumbs exist
 		} // end if phone
 	}; // end goPage()
-
+	// navigate to the next page
 	TEGFakePages.nextPage = function(event) {
 
 		if (console) {
@@ -510,6 +514,7 @@ function TEGFakePages(Options) {
 			TEGFakePages.goPage(TEGFakePages.currentPageNumber + 1);
 		} // end if last step
 	}; // end nextPage()
+	// navigate to the prvious page
 	TEGFakePages.previousPage = function(event) {
 
 		if (console) {
@@ -526,6 +531,18 @@ function TEGFakePages(Options) {
 			TEGFakePages.goPage(TEGFakePages.currentPageNumber - 1, false);
 		} // end if first step
 	}; // end previousPage()
+	// navigate to the first page with an error showing
+	TEGFakePages.errorPage = function() {
+
+		for (var counter = 0; counter < TEGFakePages.pageObjects.length; counter++) {
+
+			if (TEGFakePages.pageObjects.eq(counter).find(TEGFakePages.options.errorSelector + ':visible')) {
+				// go page uses page numbers rather than array offsets
+				TEGFakePages.goPage(counter + 1, false);
+				break;
+			} // end if this page has visible errors
+		} // end loop through pages
+	}; // end errorPage
 
 	// go to the first page
 	TEGFakePages.goPage(TEGFakePages.currentPageNumber);
