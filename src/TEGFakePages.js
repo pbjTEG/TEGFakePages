@@ -461,27 +461,29 @@ function TEGFakePages(Options) {
 		} // end if we validated
 
 		// highlight correct breadcrumb and mark as visited
-		TEGFakePages
-			.options
-			.breadcrumbs
-			.find('[data-step]')
-			.each(function() {
-				var thisCrumb = jQuery(this);
+		if (TEGFakePages.options.breadcrumbs.length > 0) {
+			TEGFakePages
+				.options
+				.breadcrumbs
+				.find('[data-step]')
+				.each(function() {
+					var thisCrumb = jQuery(this);
 
-				thisCrumb
-					.removeClass('current past');
-				if (+thisCrumb.attr('data-step') < TEGFakePages.currentPageNumber) {
 					thisCrumb
-						.addClass('past');
-
-				} else {
-					if (+thisCrumb.attr('data-step') === TEGFakePages.currentPageNumber) {
+						.removeClass('current past');
+					if (+thisCrumb.attr('data-step') < TEGFakePages.currentPageNumber) {
 						thisCrumb
-							.addClass('current')
-							.attr('data-visited', 'true');
+							.addClass('past');
+
+					} else {
+						if (+thisCrumb.attr('data-step') === TEGFakePages.currentPageNumber) {
+							thisCrumb
+								.addClass('current')
+								.attr('data-visited', 'true');
+						}
 					}
-				}
-			});
+				});
+		} // end if breadcrumbs exist
 
 		// show the top of the form page on mobile phones
 		if (jQuery.windowSize.isMobile) {
