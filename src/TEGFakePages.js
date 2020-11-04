@@ -24,7 +24,7 @@ function TEGFakePages(Options) {
 		pageItemClass         : 'step-item',
 		pageItemParentSelector: '', // find the parent element of the start of the page
 		pageIDPrefix          : 'step',
-		errorSelector         : 'error',
+		errorSelector         : '.en__field__error',
 		submitSelector        : '[type="submit"]',
 
 		// generating breadcrumb navigation
