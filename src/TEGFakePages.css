@@ -47,7 +47,8 @@ div.col.title.current {
 	}
 
 	.step-next,
-	input[type="submit"] {
+	input[type="submit"],
+	.step-nav button:not(.step-back) {
 		float: right;
 	}
 
