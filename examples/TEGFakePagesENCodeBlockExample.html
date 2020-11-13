@@ -3,15 +3,20 @@
 		display: none;
 	}
 </style>
-<link rel="stylesheet" href="https://aaf1a18515da0e792f78-c27fdabe952dfc357fe25ebf5c8897ee.ssl.cf5.rackcdn.com/2175/TEGFakePages.css" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/4.5.2/css/bootstrap-grid.min.css" />
+<link rel="stylesheet" href="https://aaf1a18515da0e792f78-c27fdabe952dfc357fe25ebf5c8897ee.ssl.cf5.rackcdn.com/2175/TEGFakePages.css?v=1605291647000" />
 <script src="https://aaf1a18515da0e792f78-c27fdabe952dfc357fe25ebf5c8897ee.ssl.cf5.rackcdn.com/2175/jquery-3.5.0.min.js" type="text/javascript"></script>
 <script src="https://aaf1a18515da0e792f78-c27fdabe952dfc357fe25ebf5c8897ee.ssl.cf5.rackcdn.com/2175/TEGUtilities.js" type="text/javascript"></script>
-<script src="https://aaf1a18515da0e792f78-c27fdabe952dfc357fe25ebf5c8897ee.ssl.cf5.rackcdn.com/2175/TEGFakePages.js" type="text/javascript"></script>
+<script src="https://aaf1a18515da0e792f78-c27fdabe952dfc357fe25ebf5c8897ee.ssl.cf5.rackcdn.com/2175/TEGFakePages.js?v=1605292551000" type="text/javascript"></script>
 <script>
 	jQuery(document).ready(function() {
 		window.TEGForm = new TEGFakePages({
 			                                  pageItemParentSelector: '.en__component',
 			                                  errorSelector         : '.en__field__error',
+			                                  runValidation         : 'engagingNetworks',
+			                                  afterLoad             : function() {
+				                                  jQuery('form').show();
+			                                  },
 		                                  });
 		// any additional stuff goes here
 	}); // end jQuery(document).ready

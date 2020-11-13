@@ -7,14 +7,12 @@
  * The Engage Group <engage@engageyourcause.com>
  */
 
-//TODO add generic per-page validation
-
 function TEGFakePages(Options) {
 	var TEGFakePages = this;
 
 	TEGFakePages.options = {
 		// find the form
-		formSelector: 'form',
+		formSelector: 'form.en__component.en__component--page',
 
 		// track the current page number
 		currentPageNumber     : 1, // enable the form to start in the middle after a reload
@@ -25,7 +23,7 @@ function TEGFakePages(Options) {
 		pageItemParentSelector: '', // find the parent element of the start of the page
 		pageIDPrefix          : 'step',
 		errorSelector         : '.en__field__error',
-		submitSelector        : '[type="submit"]',
+		submitSelector        : '.step-nav button:not(.step-back)',
 
 		// generating breadcrumb navigation
 		breadcrumbs          : jQuery('<div class="row"></div>'), // if not empty, create breadcrumbs
@@ -68,41 +66,121 @@ function TEGFakePages(Options) {
 
 		/* Some customizations might need to re-render each
 		 * time the page appears. This object allows a custom
-		 * installation to define those callbacks.
+		 * installation to define that code.
+		 *
+		 * The '0' entry below runs for every page. It's a
+		 * fair to middling example of how to use this.
 		 */
-		pageCallbacks: {
-			/*
-			 '1': {
-				 beforeShow: function(pageNumber, pageObject) {
-					 /!* take some action before the page
-					 * appears and/or skip to the next page
-					 * by returning false
-					 *!/
+		pageChange: {
+			'0': {
+				beforeShow: function(pageNumber, pageObject) {
+					// clear errors before showing a new page
+					pageObject.find(TEGFakePages.options.errorSelector).hide();
+					return true;
+				}, // end beforeShow()
+				beforeHide: function(pageNumber, pageObject) {
 
-					 if (console) {
-						 console.log('beforeLoad default\n' +
-						 'pageNumber = ' + pageNumber + '\n' +
-						 'pageObject = ' + jQuery(pageObject).class + '\n');
-					 }
-					 return true;
-				 }, // end beforeShow()
-			 beforeHide: function(pageNumber, pageObject) {
-					 /!* take some action before the page
-					 * disappears and/or prevent the user
-					 * from leaving the page by returning false
-					 *!/
+					// Are we validating?
+					if (TEGFakePages.options.runValidation === 'none') {
+						// If not, just go.
+						return true;
 
-					 if (console) {
-						 console.log('beforeHide default\n' +
-						 'pageNumber = ' + pageNumber + '\n' +
-						 'pageObject = ' + jQuery(pageObject).prop('nodeName') + '\n' +
-						 '   ID      = ' + jQuery(pageObject).attr('id') + '\n' +
-						 '   class      = ' + jQuery(pageObject).attr('class') + '\n');
-					 }
-					 return true;
-				 }, // end beforeHide()
-			 */
-		}, // end pageCallbacks()
+					} else {
+						// Otherwise, don't leave if errors are visible.
+						return pageObject.find(TEGFakePages.options.errorSelector).is(':visible');
+					}
+				}, // end beforeHide()
+			}, // end page '0' callbacks
+		}, // end pageChange()
+
+		/* Allow per-page validation by the CMS or a custom
+		 * browser-side solution.
+		 *
+		 * The value of runValidation should be a key for an
+		 * entry in the runValidSetupTypes collection of
+		 * functions. The associated function will be run
+		 * after the page navigation is set up.
+		 *
+		 * Since we do so much work for Engaging Networks,
+		 * we have a default set for them.
+		 */
+		runValidation     : 'engagingNetworks',
+		runValidationTypes: {
+			engagingNetworks: {
+				nextButtonFunc: function() {
+					TEGFakePages.newPageNumber = TEGFakePages.currentPageNumber + 1;
+					return true;
+				},
+				setup         : function() {
+					/* Alter EN's submission events to change virtual pages. If
+					 * the form is incomplete, there will be empty fields and
+					 * EN's code will call this function.
+					 */
+					window.enOnError = function() {
+						// remove the error classes, if any
+						TEGFakePages.currentPageObject.removeClass(TEGFakePages.options.sectionErrorClass);
+						TEGFakePages.form.removeClass(TEGFakePages.options.formErrorClass);
+
+						// highlight errors on the current page
+						if (TEGFakePages.currentPageObject.find(TEGFakePages.options.errorSelector).length > 0) {
+							TEGFakePages.currentPageObject.addClass(TEGFakePages.options.sectionErrorClass);
+							TEGFakePages.form.addClass(TEGFakePages.options.formErrorClass);
+
+						} else {
+
+							// no errors on current page, check if we need to navigate to the next page
+							if (TEGFakePages.currentPageNumber < TEGFakePages.lastPageNumber) {
+								// make sure error markers are cleared before showing next page
+								TEGFakePages
+									.currentPageObject
+									.siblings('section')
+									.removeClass(TEGFakePages.options.sectionErrorClass)
+									.find(TEGFakePages.options.errorSelector)
+									.remove();
+								TEGFakePages.goPage(TEGFakePages.newPageNumber, false);
+							} // end if not last page
+						}
+					}; // end enOnError()
+					window.enOnSubmit = function() {
+						// remove the error classes, if any
+						TEGFakePages.pageObjects.removeClass(TEGFakePages.options.sectionErrorClass);
+						TEGFakePages.form.removeClass(TEGFakePages.options.formErrorClass);
+
+						// are we done?
+						if (TEGFakePages.currentPageNumber === 0 ||
+						    (TEGFakePages.currentPageNumber === TEGFakePages.lastPageNumber))
+						{
+							return true;
+
+						} else {
+							TEGFakePages.goPage(TEGFakePages.newPageNumber);
+							return false;
+						} // end if we're done
+					}; // end enOnSubmit()
+				} // end setup()
+			}, // end engagingNetworks
+			none            : {
+				nextButtonFunc: function(event) {
+					TEGFakePages.nextPage(event);
+				}, // end button()
+				setup         : function() {
+					/* If we're not running validation then
+					 * just attach nextPage to the continue
+					 * buttons.
+					 */
+				},
+			}, // end none
+			custom          : {
+				nextButtonFunc: function(event) {
+					// default does nothing
+				}, // end button()
+				setup         : function() {
+					// Roll your own.
+				}, // end setup()
+			}, // end custom
+		},
+		sectionErrorClass : 'sectionError', // add this CSS class to a section (page) with errors visible
+		formErrorClass    : 'formError', // add this CSS class to the form when there are errors visible
 
 		// preferred window sizes can be set here
 		windowSizeOptions: {
@@ -119,46 +197,25 @@ function TEGFakePages(Options) {
 		afterLoad: function() {
 			return false;
 		}
-	} // end TEGFakePages.options
+	}; // end TEGFakePages.options
 	// override with options from new TEGFakePages() statement
 	jQuery.extend(TEGFakePages.options, Options);
 
 	// allow form specific overrides
-	if (typeof TEGCustomPages !== 'undefined') {
+	if (typeof TEGCustomPages !== 'undefined')
+	{
 		jQuery.extend(TEGFakePages.options, TEGCustomPages);
 	}
-	// get the donation form and hide it
-	TEGFakePages.form = jQuery(TEGFakePages.options.formSelector).hide();
+	// get the form (or page content container) and hide it
+	TEGFakePages.form = jQuery(TEGFakePages.options.formSelector);
 
-	// only continue initializing if the donation form exists
+	// only continue initializing if the page content exists
 	if (TEGFakePages.form.length === 0) {
-
-		if (console) {
-			console.log('TEGFakePages error: Form not found.');
-		}
 		return false;
 	}
 
-	// get the document
-	TEGFakePages.document = jQuery(document);
 	// get the body
-	TEGFakePages.body = TEGFakePages.document.find('body');
-	// get list of all fields
-	TEGFakePages.fields = TEGFakePages.document.find('input').add('select').add('textarea');
-	// parse query string arguments
-	TEGFakePages.args = {};
-	window.location.search.slice(1).split('&').forEach(function(arg) {
-
-		if (arg) {
-			var nv      = arg.split('='),
-			    argName = nv[0];
-
-			// scrub html
-			if (nv[1]) {
-				TEGFakePages.args[argName] = decodeURIComponent(nv[1]).replace(/</g, '');
-			}
-		}
-	}); // end query string processing
+	TEGFakePages.body = jQuery('body');
 
 	// try to initialize TEGUtilities.windowSize
 	if (typeof jQuery.windowSize === 'object') {
@@ -167,12 +224,13 @@ function TEGFakePages(Options) {
 	} else {
 
 		if (console) {
-			console.error('TEGFakePages: Refusing to load without TEGUtilities.');
-		}
+			console.log('TEG Fake Pages won\'t load without TEG jQuery Utilities.');
+		} // end if console available
 		return false;
 	}
 
 	TEGFakePages.currentPageNumber = TEGFakePages.options.currentPageNumber;
+	TEGFakePages.newPageNumber = TEGFakePages.currentPageNumber; // we need to pass this into Engaging Network's validation functions
 	// build page structure and assign length of that array to lastPageNumber
 	TEGFakePages.lastPageNumber = jQuery(TEGFakePages.options.pageStartSelector)
 		.each(function(index) {
@@ -209,7 +267,7 @@ function TEGFakePages(Options) {
 					.appendTo(thisPage);
 			}
 
-			// are we making breadrumbs?
+			// if we're adding breadcrumbs
 			if (TEGFakePages.options.breadcrumbs.length > 0) {
 				var thisCrumb,
 				    thisTitle;
@@ -246,19 +304,29 @@ function TEGFakePages(Options) {
 				// allow previous and next buttons
 				thisCrumb
 					.find('.previous')
-					.click(function(event) {
-						event.preventDefault();
-						TEGFakePages.previousPage(event);
-					});
-				thisCrumb
-					.find('.next')
-					.click(function(event) {
-						TEGFakePages.nextPage(event);
-					});
+					.click(TEGFakePages.previousPage);
+
+				// Handle next page navigation according to validation settings
+				if (TEGFakePages.options.runValidation === 'none') {
+					thisCrumb
+						.find('.next')
+						.click(TEGFakePages.nextPage);
+
+				} else {
+					thisCrumb
+						.find('.next')
+						.click(function(event) {
+							event.preventDefault();
+							event.stopImmediatePropagation();
+							TEGFakePages.form.submit();
+						});
+				} // end if CMS or custom validation
+
 				thisCrumb
 					.attr('data-step', index + 1)
 					.click(function(event) {
 						event.preventDefault();
+						event.stopImmediatePropagation();
 						var thisStep = jQuery(this);
 
 						/* Make the user click the page buttons to
@@ -286,179 +354,142 @@ function TEGFakePages(Options) {
 
 			// if we're adding page buttons
 			if (TEGFakePages.options.pageButtons.length > 0) {
+				var newButtons  = TEGFakePages.options
+				                              .pageButtons
+				                              .clone(),
+				    newNext     = TEGFakePages.options
+				                              .continueButton
+				                              .clone()
+				                              .on('click keydown', function(event) {
+					                              TEGFakePages.options.runValidationTypes[TEGFakePages.options.runValidation].nextButtonFunc(event);
+				                              }),
+				    newPrevious = TEGFakePages.options
+				                              .backButton
+				                              .clone()
+				                              .on('click keydown', function(event) {
+					                              TEGFakePages.previousPage(event);
+				                              });
 
 				// if first page
 				if (index === 0) {
 					// first page gets only the continue button
-					thisPage
-						.append(
-							TEGFakePages
-								.options
-								.pageButtons
-								.clone()
-								.append(
-									TEGFakePages
-										.options
-										.continueButton
-										.clone()
-										.click(function(event) {
-											TEGFakePages.nextPage(event);
-										})
-								)
-						); // end thisPage.append()
+					newButtons.append(newNext);
 
-					// end if first page
 				} else {
+
+					// otherwise, if last page
 					if (thisPage.find(TEGFakePages.options.submitSelector).length > 0) {
 						// last page gets back button added to submit button
-						thisPage
-							.append(
-								TEGFakePages
-									.options
-									.pageButtons
-									.clone()
-									.append(
-										thisPage.find(TEGFakePages.options.submitSelector)
-									)
-									.append(
-										TEGFakePages
-											.options
-											.backButton
-											.clone()
-											.click(function(event) {
-												event.preventDefault();
-												TEGFakePages.previousPage(event);
-											})
-									) // end .append() to pageButtons
-							); // end .append() to page
+						newButtons.append(thisPage.find(TEGFakePages.options.submitSelector))
+						          .append(newPrevious);
 
-						// end if last page with EN submit button
 					} else {
 						/* All other pages get back and continue buttons.
 						 * Note: continue is first so it can appear above
 						 * the back button on mobile.
 						 */
-						thisPage
-							.append(
-								TEGFakePages
-									.options
-									.pageButtons
-									.clone()
-									.append(
-										TEGFakePages
-											.options
-											.continueButton
-											.clone()
-											.click(function(event) {
-												TEGFakePages.nextPage(event);
-											})
-									)
-									.append(
-										TEGFakePages
-											.options
-											.backButton
-											.clone()
-											.click(function(event) {
-												event.preventDefault();
-												TEGFakePages.previousPage(event);
-											})
-									)
-							); // end thisPage.append()
-					} // end if adding buttons
+						newButtons.append(newNext)
+						          .append(newPrevious);
+					} // end if last page
 				} // end if first page
-			} // end if pageButtons has content
-		}) // end each()
-		.length; // end assign number of pages to options.lastPageNumber
+				thisPage.append(newButtons);
+			} // end if adding buttons
+		}) // end pageStartSelector.each()
+		.length; // end assign number of pages to lastPageNumber
 	// create a list of all the new pages
 	TEGFakePages.pageObjects = TEGFakePages.form.find('[id^="' + TEGFakePages.options.pageIDPrefix + '"]');
 	// reference to current page
 	TEGFakePages.currentPageObject = TEGFakePages.pageObjects
 	                                             .eq(TEGFakePages.currentPageNumber - 1)
 	                                             .addClass(TEGFakePages.options.currentPageClass);
+
+	// Run the setup function for the validation
+	TEGFakePages.options.runValidationTypes[TEGFakePages.options.runValidation].setup();
+
 	/* Start at the specified page number and use
 	 * an "internal" variable for the page counter.
 	 */
-	TEGFakePages.goPage = function(page, runValidation) {
-		var validate = false; // default to no validation
-
-		// set validate from parameter
-		if (typeof runValidation !== 'undefined') {
-			validate = runValidation;
-		}
+	TEGFakePages.goPage = function(page, goPageRunValidation) {
+		// We only need the validation steps if validation is globally enabled.
+		goPageRunValidation = goPageRunValidation && (typeof TEGFakePages.options.runValidation === 'function');
 
 		// don't go to a page that doesn't exist
-		if (page > TEGFakePages.options.lastPageNumber) {
+		if (page > TEGFakePages.lastPageNumber) {
 			return false;
 		}
 
-		/* don't validate if:
+		/* Don't check validation if:
 		 * initial page load
 		 * going backward
-		 * validate is false
+		 * runValidation is false
 		 */
-		if (page > TEGFakePages.currentPageNumber && validate) {
+		if (page > TEGFakePages.currentPageNumber &&
+		    goPageRunValidation)
+		{
 
-			// if the current page doesn't pass
-			if (!TEGFakePages.parsley.validate({group: TEGFakePages.options.pageIDPrefix + TEGFakePages.currentPageNumber})) {
+			// if there are any errors from a CMS's field validation or custom validation
+			if (TEGFakePages.currentPageObject.find(TEGFakePages.options.errorSelector).is(':visible')) {
 				return false;
 			}
 		}
 
-		// if there are any errors from a CMS's field validation
-		if (TEGFakePages.currentPageObject.find(TEGFakePages.options.errorSelector).is(':visible')) {
-			return false;
-		}
+		// If beforeHide() exists for all pages, run it.
+		if (TEGFakePages.options.pageChange.hasOwnProperty(TEGFakePages.currentPageNumber) &&
+		    TEGFakePages.options.pageChange['0'].hasOwnProperty('beforeHide'))
+		{
+			TEGFakePages.options
+				.pageChange['0'].beforeHide(TEGFakePages.currentPageNumber, TEGFakePages.currentPageObject);
+		} // end if beforeHide() exists for all pages
 
-		// if the beforeHide() callback exists
-		if (TEGFakePages.options.pageCallbacks.hasOwnProperty(TEGFakePages.currentPageNumber) &&
-		    TEGFakePages.options.pageCallbacks[TEGFakePages.currentPageNumber].hasOwnProperty('beforeHide'))
+		// if beforeHide() exists for current page
+		if (TEGFakePages.options.pageChange.hasOwnProperty(TEGFakePages.currentPageNumber) &&
+		    TEGFakePages.options.pageChange[TEGFakePages.currentPageNumber].hasOwnProperty('beforeHide'))
 		{
 
-			// and the callback returns false
+			// and the function returns false
 			if (!TEGFakePages
 				.options
-				.pageCallbacks[TEGFakePages.currentPageNumber]
+				.pageChange[TEGFakePages.currentPageNumber]
 				.beforeHide(TEGFakePages.currentPageNumber, TEGFakePages.currentPageObject))
 			{
 				return false;
 			} // end if not cleared to leave
-		} // end if callback exists
+		} // end if beforeHide() exists for current page
 
-		// if the beforeShow() callback exists
-		if (TEGFakePages.options.pageCallbacks.hasOwnProperty(page) &&
-		    TEGFakePages.options.pageCallbacks[page].hasOwnProperty('beforeShow'))
+		// If beforeShow() exists for all pages, run it.
+		if (TEGFakePages.options.pageChange.hasOwnProperty(TEGFakePages.currentPageNumber) &&
+		    TEGFakePages.options.pageChange['0'].hasOwnProperty('beforeShow'))
+		{
+			TEGFakePages.options
+				.pageChange['0'].beforeShow(TEGFakePages.currentPageNumber, TEGFakePages.currentPageObject);
+		} // end if beforeShow() exists for all pages
+
+		// If beforeShow() exists for current page
+		if (TEGFakePages.options.pageChange.hasOwnProperty(page) &&
+		    TEGFakePages.options.pageChange[page].hasOwnProperty('beforeShow'))
 		{
 
-			// and the callback returns false
+			// and the function returns false
 			if (!TEGFakePages
 				.options
-				.pageCallbacks[page]
+				.pageChange[page]
 				.beforeShow(page, TEGFakePages.body.find('section#' + TEGFakePages.options.pageIDPrefix + page)))
 			{
 				// then skip to the new page with no validation
 				TEGFakePages.goPage(TEGFakePages.currentPageNumber + 1, false);
 				// and don't let this instance of the recursion continue
 				return false;
-			} // end if callback fails
-		} // endif callback exists
-
-		TEGFakePages.currentPageNumber = +page;
+			} // end if not cleared to leave
+		} // endif beforeShow() exists for current page
 
 		// set new step number
+		TEGFakePages.currentPageNumber = +page;
 		// set current page pointer
 		TEGFakePages.pageObjects.removeClass('current');
 		TEGFakePages.currentPageObject = TEGFakePages.pageObjects.eq(TEGFakePages.currentPageNumber - 1);
 		// mark the current page for CSS styles
 		TEGFakePages.pageObjects.removeClass(TEGFakePages.options.currentPageClass);
 		TEGFakePages.currentPageObject.addClass(TEGFakePages.options.currentPageClass);
-
-		// if we validated the page
-		if (validate) {
-			// clear any remnant error notices
-			TEGFakePages.currentPageObject
-			            .find(TEGFakePages.options.errorSelector)
-			            .hide();
-		} // end if we validated
 
 		// highlight correct breadcrumb and mark as visited
 		if (TEGFakePages.options.breadcrumbs.length > 0) {
@@ -501,44 +532,30 @@ function TEGFakePages(Options) {
 	}; // end goPage()
 	// navigate to the next page
 	TEGFakePages.nextPage = function(event) {
-
-		if (console) {
-			console.log('nextPage\n' +
-			            'event.currentTarget.id = ' + event.currentTarget.id + '\n');
-		}
-
-		// prevent submit action
 		event.preventDefault();
 		event.stopImmediatePropagation();
-
-		// only go forward if not last step
-		if (TEGFakePages.currentPageNumber < TEGFakePages.lastPageNumber) {
-			TEGFakePages.goPage(TEGFakePages.currentPageNumber + 1);
-		} // end if last step
+		TEGFakePages.newPageNumber = TEGFakePages.currentPageNumber + 1;
+		TEGFakePages.goPage(TEGFakePages.newPageNumber, false);
 	}; // end nextPage()
 	// navigate to the prvious page
 	TEGFakePages.previousPage = function(event) {
-
-		if (console) {
-			console.log('previousPage\n' +
-			            'event.currentTarget.id = ' + event.currentTarget.id + '\n');
-		}
-
-		// prevent submit action
+		// Never validate if navigating backward.
 		event.preventDefault();
 		event.stopImmediatePropagation();
 
 		// only go backward if not first step
 		if (TEGFakePages.currentPageNumber > 1) {
-			TEGFakePages.goPage(TEGFakePages.currentPageNumber - 1, false);
+			TEGFakePages.newPageNumber = TEGFakePages.currentPageNumber - 1;
+			TEGFakePages.goPage(TEGFakePages.newPageNumber, false);
 		} // end if first step
 	}; // end previousPage()
+
 	// navigate to the first page with an error showing
 	TEGFakePages.errorPage = function() {
 
 		for (var counter = 0; counter < TEGFakePages.pageObjects.length; counter++) {
 
-			if (TEGFakePages.pageObjects.eq(counter).find(TEGFakePages.options.errorSelector + ':visible')) {
+			if (TEGFakePages.pageObjects.eq(counter).find(TEGFakePages.options.errorSelector + ':visible').length > 0) {
 				// go page uses page numbers rather than array offsets
 				TEGFakePages.goPage(counter + 1, false);
 				break;
@@ -546,12 +563,17 @@ function TEGFakePages(Options) {
 		} // end loop through pages
 	}; // end errorPage
 
-	// go to the first page
-	TEGFakePages.goPage(TEGFakePages.currentPageNumber);
-	// tell the breadcrumbs we've seen the first page
-	jQuery('[data-step="1"]').attr('data-visited', 'true');
+	// go to the appropriate page
+	if (TEGFakePages.form.find(TEGFakePages.options.errorSelector + ':visible').length > 0) {
+		// if there are errors visible, go to the first with those errors
+		TEGFakePages.errorPage();
+
+	} else {
+		// otherwise, go to the (ostensibly) first page
+		TEGFakePages.goPage(TEGFakePages.currentPageNumber);
+	}
+	// tell the breadcrumbs (if any) that we've seen the first page viewed
+	jQuery('[data-step="' + TEGFakePages.currentPageNumber + '"]').attr('data-visited', 'true');
 	// run custom additional code
 	TEGFakePages.options.afterLoad(TEGFakePages.options);
-	// we're done setting up, show the form
-	TEGFakePages.form.show();
 } // end TEGFakePages
