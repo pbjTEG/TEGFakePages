@@ -20,7 +20,7 @@ function TEGFakePages(Options) {
 		pageStartSelector     : '.step', // start of a fake page
 		pageExcludeSelector   : '.step-exclude', // don't include in fake page structure
 		pageItemClass         : 'step-item',
-		pageItemParentSelector: '', // find the parent element of the start of the page
+		pageItemParentSelector: '.en__component', // find the parent element of the start of the page
 		pageIDPrefix          : 'step',
 		errorSelector         : '.en__field__error',
 		submitSelector        : '.en__submit > button',
