@@ -5,6 +5,7 @@ describe('TEGFakePages', function() {
 			formSelector          : 'form[action="#"]',
 			currentPageNumber     : 2,
 			pageItemParentSelector: '.itemParent',
+			submitSelector        : 'input[type="submit"]',
 			runValidation         : 'custom',
 			runValidationTypes    : {
 				custom: {
@@ -41,6 +42,7 @@ describe('TEGFakePages', function() {
 		spyOn(window.fakePageOptions.windowSizeOptions, 'afterWindowSize').and.callThrough();
 
 		window.testForm = new TEGFakePages(window.fakePageOptions);
+		window.launchCurrentPage = window.testForm.currentPageObject.attr('id');
 	});
 
 	describe('form', function() {
@@ -76,11 +78,17 @@ describe('TEGFakePages', function() {
 		}); // end pageObjects should be 3
 	}); // end describe('pageObjects')
 
-	describe('currentPageObject', function() {
+	describe('currentPageObject at launch', function() {
 		it('should be page two', function() {
-			expect(window.testForm.currentPageObject.attr('id')).toBe('step1');
+			expect(window.launchCurrentPage).toBe('step1');
 		}); // end currentPage should be 2
 	}); // end describe('currentPage')
+
+	describe('Last Page', function() {
+		it('should have two buttons', function() {
+			expect(testForm.pageObjects.eq(2).find('button, input[type="submit"]').length).toBe(2);
+		}); // end Last Page shoud have two buttons
+	}); // end describe('Last Page')
 
 	describe('afterLoad', function() {
 		it('should be called', function() {
@@ -168,7 +176,6 @@ describe('TEGFakePages', function() {
 			window.testForm.goPage(1, false);
 			window.testForm.errorPage();
 			expect(window.testForm.currentPageNumber).toBe(3);
-			expect(window.testForm.newPageNumber).toBe(3);
 			expect(window.testForm.currentPageObject.attr('id')).toBe('step2');
 		}); // end errorPage() should find the page with errors
 	}); // end describe('errorPage()')

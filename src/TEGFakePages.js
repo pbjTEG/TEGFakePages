@@ -23,7 +23,7 @@ function TEGFakePages(Options) {
 		pageItemParentSelector: '', // find the parent element of the start of the page
 		pageIDPrefix          : 'step',
 		errorSelector         : '.en__field__error',
-		submitSelector        : '.step-nav button:not(.step-back)',
+		submitSelector        : '.en__submit > button',
 
 		// generating breadcrumb navigation
 		breadcrumbs          : jQuery('<div class="row"></div>'), // if not empty, create breadcrumbs
