@@ -39,16 +39,19 @@ function TEGFakePages(Options) {
 		 * <div class="col title">Donation Info<span class="desktopView">rmation</span></h1>
 		 *
 		 *
-		 * If the item defined by pageStartSelector has the
-		 * attribute data-breadcrumb, then the value of that
-		 * attribute will be rendered in the breadcrumb item.
-		 * With the default settings for example:
+		 * If the item defined by pageStartSelector has the attribute data-breadcrumb, then the
+		 * value of that attribute will be rendered in the breadcrumb item. With the default
+		 * settings for example:
 		 *
 		 * <h1 class='.step' data-breadcrumb="Donation Info">Donation Information</h1>
 		 *
 		 * will generate the breadcrumb
 		 *
 		 * <div class="col title">Donation Info</h1>
+		 *
+		 * Anything with the CSS class '.previous' will have the previousPage() function
+		 * attached. Anything with the CSS class '.next' will have the nextPage()
+		 * function attached.
 		 */
 		// @formatter:off
 		breadcrumbItemMobile : jQuery('<div class="row"></div>')
@@ -299,43 +302,47 @@ function TEGFakePages(Options) {
 
 				} else {
 					thisTitle = thisItem.html();
-				}
+				} // end if data-breadcrumb exists
 
-				// allow previous and next buttons
-				thisCrumb
-					.find('.previous')
-					.click(TEGFakePages.previousPage);
+				// add navigation functions
+				if (thisCrumb.find('.previous, .next').length > 0) {
+					// ostensibly for mobile but anything with .previous or .next
+					thisCrumb.find('.previous')
+					         .on('click keydown tap', function(event) {
+					         	// just in case the configuration attaches this to a button element
+						         TEGFakePages.previousPage(event);
+					         });
+					thisCrumb.find('.next')
+					         .on('click keydown tap', function(event) {
 
-				// Handle next page navigation according to validation settings
-				if (TEGFakePages.options.runValidation === 'none') {
+						         /* Make the user click the page buttons to
+						          * submit the form for any page validation.
+						          */
+						         if (jQuery(this).attr('data-visited') === 'true') {
+										TEGFakePages.nextPage(event);
+						         }
+					         });
 					thisCrumb
-						.find('.next')
-						.click(TEGFakePages.nextPage);
+						.attr('data-step', index + 1);
 
 				} else {
+					// for views without .previous or .next
 					thisCrumb
-						.find('.next')
-						.click(function(event) {
+						.attr('data-step', index + 1)
+						.on('click keydown tap', function(event) {
 							event.preventDefault();
 							event.stopImmediatePropagation();
-							TEGFakePages.form.submit();
+							var thisStep = jQuery(this);
+
+							/* Make the user click the page buttons to
+							 * submit the form for EN native validation.
+							 */
+							if (thisStep.attr('data-visited') === 'true') {
+								TEGFakePages.goPage(+thisStep.attr('data-step'));
+							}
 						});
-				} // end if CMS or custom validation
+				} // end if .previous or .next are present
 
-				thisCrumb
-					.attr('data-step', index + 1)
-					.click(function(event) {
-						event.preventDefault();
-						event.stopImmediatePropagation();
-						var thisStep = jQuery(this);
-
-						/* Make the user click the page buttons to
-						 * submit the form for EN native validation.
-						 */
-						if (thisStep.attr('data-visited') === 'true') {
-							TEGFakePages.goPage(+thisStep.attr('data-step'));
-						}
-					});
 				// set the breadcrumb content
 				var titleItem = thisCrumb;
 

@@ -1,5 +1,5 @@
-/* TQPages
- * Baseline styles for pagination.
+/* TEGFakePages
+ * Default styles matching default content for pagination.
  *
  * Copyright 2020, PMG / The Production Management Group, Ltd.
  * Released under the MIT license.
@@ -20,6 +20,7 @@ section[id^="step"].current {
 	margin: 10pt 0 10pt;
 }
 
+/* default tablet and desktop breadcrumbs */
 div[data-visited="true"] {
 	background: lightgray;
 	cursor: pointer;
@@ -31,6 +32,37 @@ div[data-visited="true"].current {
 
 div.col.title.current {
 	border: 1px solid black;
+}
+
+/* default mobile breadcrumbs */
+.row > .row {
+	display: none;
+}
+
+.row > .row.current {
+	display: flex;
+	margin: 0;
+	width: 100%;
+}
+
+/* indicate what the .previous object should to */
+.row > .row .previous::before {
+	content: "<"
+}
+
+/* indicate that won't work on the first page */
+.row > .row:first-child .previous::before {
+	content: " ";
+}
+
+/* indicate what the .next object should do */
+.row > .row .next::before {
+	content: ">"
+}
+
+/* indicate that won't work on the last page */
+.row > .row:last-child .next::before {
+	content: " ";
 }
 
 /* We do a lot of Engaging Networks customization. */
