@@ -3,7 +3,7 @@ describe('TEGFakePages', function() {
 	beforeAll(function() {
 		window.fakePageOptions = {
 			formSelector          : 'form[action="#"]',
-			currentPageNumber     : 2,
+			currentPageNumber     : 1,
 			pageItemParentSelector: '.itemParent',
 			submitSelector        : 'input[type="submit"]',
 			runValidation         : 'custom',
