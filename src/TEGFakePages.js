@@ -562,7 +562,7 @@ function TEGFakePages(Options) {
 
 		for (var counter = 0; counter < TEGFakePages.pageObjects.length; counter++) {
 
-			if (TEGFakePages.pageObjects.eq(counter).find(TEGFakePages.options.errorSelector + ':visible').length > 0) {
+			if (TEGFakePages.pageObjects.eq(counter).find(TEGFakePages.options.errorSelector).length > 0) {
 				// go page uses page numbers rather than array offsets
 				TEGFakePages.goPage(counter + 1, false);
 				break;

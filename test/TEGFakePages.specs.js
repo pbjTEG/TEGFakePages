@@ -1,6 +1,7 @@
 describe('TEGFakePages', function() {
 
 	beforeAll(function() {
+		window.testEvent = new Event('test event');
 		window.fakePageOptions = {
 			formSelector          : 'form[action="#"]',
 			currentPageNumber     : 2,
@@ -10,7 +11,11 @@ describe('TEGFakePages', function() {
 			runValidationTypes    : {
 				custom: {
 					nextButtonFunc: function(event) {
-						window.testForm.newPageNumber = window.testForm.currentPageNumber + 1;
+						if (event.type !== 'test event') {
+							event.preventDefault();
+							event.stopImmediatePropagation();
+						}
+						testForm.nextPage(event);
 						return 'custom.nextButtonFunc()';
 					},
 					setup         : function() {
@@ -61,7 +66,7 @@ describe('TEGFakePages', function() {
 	describe('newPageNumber', function() {
 		it('should be 2', function() {
 			window.testForm.goPage(2, false);
-			window.testForm.nextPage(new Event('test event'));
+			window.testForm.nextPage(window.testEvent);
 			expect(window.testForm.newPageNumber).toBe(3);
 		}); // end newPageNumber should be 3
 	}); // end describe('newPageNumber')
@@ -115,11 +120,11 @@ describe('TEGFakePages', function() {
 		}); // end setup should be called
 		it('nextButtonFunc() should be called', function() {
 			window.testForm.goPage(1, false);
-			window.testForm.currentPageObject.find('.step-next')[0].click(new Event('test event'));
+			window.testForm.currentPageObject.find('.step-next')[0].click(window.testEvent);
 			expect(window.testForm.options.runValidationTypes[window.testForm.options.runValidation].nextButtonFunc).toHaveBeenCalled();
 		}); // end runValidation should be called
 		it('nextButtonFunc() should be custom', function() {
-			expect(window.testForm.options.runValidationTypes[window.testForm.options.runValidation].nextButtonFunc()).toBe('custom.nextButtonFunc()');
+			expect(window.testForm.options.runValidationTypes[window.testForm.options.runValidation].nextButtonFunc(window.testEvent)).toBe('custom.nextButtonFunc()');
 		}); // end nextButtonFunc() should be custom
 	}); // end describe('runValidation')
 
@@ -153,7 +158,7 @@ describe('TEGFakePages', function() {
 	describe('nextPage()', function() {
 		it('should go to next page', function() {
 			window.testForm.goPage(1, false);
-			window.testForm.nextPage(new Event('test event'));
+			window.testForm.nextPage(window.testEvent);
 			expect(window.testForm.currentPageNumber).toBe(2);
 			expect(window.testForm.newPageNumber).toBe(2);
 			expect(window.testForm.currentPageObject.attr('id')).toBe('step1');
@@ -163,7 +168,7 @@ describe('TEGFakePages', function() {
 	describe('previousPage()', function() {
 		it('should go to previous page', function() {
 			window.testForm.goPage(3, false);
-			window.testForm.previousPage(new Event('test event'));
+			window.testForm.previousPage(window.testEvent);
 			expect(window.testForm.currentPageNumber).toBe(2);
 			expect(window.testForm.newPageNumber).toBe(2);
 			expect(window.testForm.currentPageObject.attr('id')).toBe('step1');
