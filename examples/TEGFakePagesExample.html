@@ -22,9 +22,7 @@
 				                                  submitSelector        : 'input[type="submit"]',
 				                                  pageItemParentSelector: '',
 				                                  runValidation         : 'none',
-				                                  afterLoad             : function() {
-					                                  jQuery('form').show();
-				                                  }
+				                                  afterLoad             : () => { jQuery('form').show(); }
 			                                  });
 			// any additional stuff goes here
 		}); // end jQuery(document).ready
