@@ -148,10 +148,11 @@ describe('TEGFakePages', function() {
 		}); // end Breadcrumbs should exist
 		it('should match pages', function() {
 			window.testForm.goPage(2, false);
-			expect(jQuery('.breadcrumbItem').eq(0).is('.past')).toBe(true);
-			expect(jQuery('.breadcrumbItem').eq(1).is('.current')).toBe(true);
-			expect(jQuery('.breadcrumbItem').eq(2).is(':not(.past)')).toBe(true);
-			expect(jQuery('.breadcrumbItem').eq(2).is(':not(.current)')).toBe(true);
+			let breadcrumbItems = jQuery('.breadcrumbItem');
+			expect(breadcrumbItems.eq(0).is('.past')).toBe(true);
+			expect(breadcrumbItems.eq(1).is('.current')).toBe(true);
+			expect(breadcrumbItems.eq(2).is(':not(.past)')).toBe(true);
+			expect(breadcrumbItems.eq(2).is(':not(.current)')).toBe(true);
 		}); // end Breadcrumbs should match pages
 	}); // end describe('Breadcrumbs')
 
