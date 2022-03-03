@@ -51,8 +51,8 @@
 	<script src="https://cdn.jsdelivr.net/gh/google/code-prettify@master/loader/run_prettify.js"></script>
 </head>
 <body>
-<h1>TEG jQuery Fake Pages</h1>
-<p>Collects portions of page content into &quot;pages&quot; and generates navigation to show those pages sequentially. The library also provides hooks to perform per-page validation and halt navigation if necessary.</p>
+<h1>TEG jQuery Fake Pages 2.0</h1>
+<p>Collects portions of page content into &quot;pages&quot; and generates navigation to show those pages sequentially. The library also provides hooks to perform per-page validation and halt navigation, if necessary.</p>
 <h2>Requires</h2>
 <ul>
 	<li><a href="https://code.jquery.com/">jQuery 3.5+</a></li>
@@ -61,6 +61,12 @@
 <h2>Recommended</h2>
 <ul>
 	<li>Bootstrap Grid (required for default content options)</li>
+</ul>
+<h2>Examples</h2>
+<ul>
+	<li><a href="TEGFakePagesENCodeBlockExample.html">Example Of A Code Block For An Engaging Networks Form</a></li>
+	<li><a href="TEGFakePagesExample.html">Example Of A Complex Form</a></li>
+	<li><a href="TEGFakePagesByCountExample.html">Example Of A List of Similar Items</a></li>
 </ul>
 <h2>Provided</h2>
 <dl>
@@ -72,14 +78,15 @@
 <h2>Installation</h2>
 <p>Link the styles and JavaScript in the <code class="prettyprint lang-javascript">&lt;head&gt;</code> element of the page.</p>
 <pre class="prettyprint lang-html">
+  &lt;link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap-grid.min.css" />
   &lt;link rel="stylesheet" href="https://foo.bar.com/path/to/files/TEGFakePages.css" />
-  &lt;script src="https://foo.bar.com/path/to/files/jquery-3.5.0.min.js" type="text/javascript">&lt;/script>
+  &lt;script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" type="text/javascript">&lt;/script>
   &lt;script src="https://foo.bar.com/path/to/files/TEGUtilities.js" type="text/javascript">&lt;/script>
   &lt;script src="https://foo.bar.com/path/to/files/TEGFakePages.js" type="text/javascript">&lt;/script>
 </pre>
 <p>Initialize the pagination in a <code class="prettyprint lang-javascript">script</code> element or
 	<code class="prettyprint lang-javascript">.js</code> file. See
-	<code class="prettyprint lang-javascript"><a href="#Options">options</a></code> below.
+	<code class="prettyprint lang-javascript"><a href="#options">options</a></code> below.
 </p>
 <pre class="prettyprint lang-html">
 &lt;script>
@@ -114,6 +121,8 @@
 	<dd>A jQuery object containing the currently viewed page.</dd>
 </dl>
 <h2 id="OptionsSection">Options</h2>
+<p>The options for fake pagination are extensive due to the need for compliance with client requirements. It&rsquo;s still easier than rewriting the &iexcl;&iexcl;asfg!! code every time.</p>
+<p>The default settings reflect applying fake pagination to Engaging Networks donation forms. Though they have multipage forms, they have no backward navigation. Clicking the back button in the browser discards any information on the current page.</p>
 <table>
 	<thead>
 	<tr>
@@ -135,12 +144,18 @@
 	<tr>
 		<td id="formSelector">formSelector</td>
 		<td>String</td>
-		<td><code class="prettyprint lang-javascript">'form'</code></td>
+		<td><code class="prettyprint lang-javascript">'form.en__component.en__component--page'</code></td>
 		<td>CSS selector identifying the innermost HTML element which contains all of the paginated content.</td>
 	</tr>
 	<tr>
+		<td id="options.pageLength">pageLength</td>
+		<td>number</td>
+		<td><code class="prettyprint lang-javascript">0</code></td>
+		<td>The number of items to include on a fake page. If 0 then the start of each page will be determined by <a href="#pageStartSelector">pageStartSelector</a> below. If any other value then the content is assumed to be a simple list of repeating structure. This defaults to 0 to handle more complex structure like a donation form.</td>
+	</tr>
+	<tr>
 		<td id="options.currentPageNumber">currentPageNumber</td>
-		<td id="number">number</td>
+		<td>number</td>
 		<td><code class="prettyprint lang-javascript">1</code></td>
 		<td>Enable the form to start in the middle after a reload.</td>
 	</tr>
@@ -171,7 +186,7 @@
 	<tr>
 		<td id="pageItemParentSelector">pageItemParentSelector</td>
 		<td>String</td>
-		<td><code class="prettyprint lang-javascript">'parent'</code></td>
+		<td><code class="prettyprint lang-javascript">'.en__component'</code></td>
 		<td>CSS selector identifying a parent of the HTML element defined by
 			<code class="prettyprint lang-javascript"><a href="#pageStartSelector">pageStartSelector</a></code>. On content management systems (CMS), there will be rather a lot of additional HTML. The CMS will generate some repeating container element for all the blocks of HTML which must appear on each fake page. This additional HTML likely needs to be kept with the content defined by the client in order for the CMS to continue proper function. The
 			<code class="prettyprint lang-javascript">&lt;section /></code> element which defines each page will be wrapped around the various sibling elements identified by this selector.
@@ -186,20 +201,20 @@
 	<tr>
 		<td id="errorSelector">errorSelector</td>
 		<td>String</td>
-		<td><code class="prettyprint lang-javascript">'error'</code></td>
+		<td><code class="prettyprint lang-javascript">'.en__field__error'</code></td>
 		<td>CSS selector of error messages that may appear on the page. If any are visible, the user will not be allowed to go forward to the next page.</td>
 	</tr>
 	<tr>
 		<td id="submitSelector">submitSelector</td>
 		<td>String</td>
-		<td><code class="prettyprint lang-javascript">'[type="submit"]'</code></td>
+		<td><code class="prettyprint lang-javascript">'.en__submit > button'</code></td>
 		<td>CSS selector of the submit button for the form. The HTML element found will define the end of the pagination.</td>
 	</tr>
 	<tr>
 		<td id="breadcrumbs">breadcrumbs</td>
 		<td>jQuery object</td>
 		<td><code class="prettyprint lang-javascript">jQuery('&lt;div class="row">&lt;/div>')</code></td>
-		<td>jQuery object containing the model HTML for a row of breadcrumb naviation. If this is empty, no breadcrumbs will be created.</td>
+		<td>jQuery object containing the model HTML for a row of breadcrumb navigation. If this is empty, no breadcrumbs will be created.</td>
 	</tr>
 	<tr>
 		<td id="breadcrumbItemMobile">breadcrumbItemMobile</td>
@@ -212,19 +227,21 @@ jQuery('&lt;div class="row">&lt;/div>')
    .append('&lt;div class="col-2 next">&nbsp;&lt;/div>')
 </pre>
 		</td>
-		<td>jQuery object containing the model HTML for a single breadrumb item for mobile phones. The visible HTML will be inserted in the innermost HTML element of this object.</td>
+		<td>
+			<p>jQuery object containing the model HTML for a single breadcrumb item for mobile phones. The visible HTML will be inserted in the innermost HTML element of this object.</p>
+			<p>Anything with the CSS class <code class="prettyprint lang-javascript">.previous</code> will have the <code class="prettyprint lang-javascript">previousPage()</code> function attached. Anything with the CSS class <code class="prettyprint lang-javascript">.next</code> will have the <code class="prettyprint lang-javascript">nextPage()</code> function attached. While this feature was designed for the mobile view, it can be used with any fo the breadcrumb view-specific options.</td>
 	</tr>
 	<tr>
 		<td id="breadcrumbItemTablet">breadcrumbItemTablet</td>
 		<td>jQuery object</td>
 		<td><code class="prettyprint lang-javascript">jQuery('&lt;div class="col title">&lt;/div>')</code></td>
-		<td>jQuery object containing the model HTML for a single breadrumb item for tablets.< The visible HTML will be inserted in the innermost HTML element of this object./td>
+		<td>jQuery object containing the model HTML for a single  item for tablets.< The visible HTML will be inserted in the innermost HTML element of this object./td>
 	</tr>
 	<tr>
 		<td id="breadcrumbItemDesktop">breadcrumbItemDesktop</td>
 		<td>jQuery object</td>
 		<td><code class="prettyprint lang-javascript">jQuery('&lt;div class="col title">&lt;/div>')</code></td>
-		<td>jQuery object containing the model HTML for a single breadrumb item for desktop computers. The visible HTML will be inserted in the innermost HTML element of this object.</td>
+		<td>jQuery object containing the model HTML for a single breadcrumb item for desktop computers. The visible HTML will be inserted in the innermost HTML element of this object.</td>
 	</tr>
 	<tr>
 		<td colspan="4">
@@ -435,6 +452,23 @@ function() {
 	</tr>
 	</tbody>
 </table>
+<h2 id="Getters">Getters</h2>
+<dl>
+	<dt><code class="prettyprint lang-javascript">currentPageObject</code></dt>
+	<dd>Returns a jQuery object representing the currently visible page.</dd>
+
+	<dt><code class="prettyprint lang-javascript">currentPageNumber</code></dt>
+	<dd>Returns the number of the currently visible page. This is an ordinal number and not an array offset.</dd>
+
+	<dt><code class="prettyprint lang-javascript">pageObjects</code></dt>
+	<dd>Returns a jQuery object representing all the fake pages.</dd>
+
+	<dt><code class="prettyprint lang-javascript">lastPageNumber</code></dt>
+	<dd>Returns the number of the last fake page. This is an ordinal number and not an array offset.</dd>
+
+	<dt><code class="prettyprint lang-javascript">newPageNumber</code></dt>
+	<dd>Returns the number of the page about to be revealed. This value is set when one of the navigation buttons or breadcrumb items is clicked.</dd>
+</dl>
 <h2 id="Methods">Methods</h2>
 <dl>
 	<dt><code class="prettyprint lang-javascript">goPage(page, <em>runValidation</em>)</code></dt>
@@ -446,6 +480,8 @@ function() {
 	<dd>If the user is not viewing the last page, this will call <code class="prettyprint lang-javascript">goPage()</code> to navigate to the next page.</dd>
 	<dt><code class="prettyprint lang-javascript">previousPage()</code></dt>
 	<dd>If the user is not viewing the first page, this will call <code class="prettyprint lang-javascript">goPage()</code> to navigate to the previous page.</dd>
+	<dt><code class="prettyprint lang-javascript">errorPage()</code></dt>
+	<dd>For donation forms; navigate to the first page with an error message inserted by the CMS or donation processing platform.</dd>
 </dl>
 </body>
 </html>

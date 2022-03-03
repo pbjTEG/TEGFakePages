@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<!--suppress JSUnresolvedLibraryURL -->
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<title>TEG Fake Pages On List</title>
+	<meta content="width=device-width, initial-scale=1.0" name="viewport" />
+	<style>
+		#myList {
+			display: none;
+		}
+	</style>
+	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap-grid.min.css" rel="stylesheet" />
+	<link href="../src/TEGFakePages.css" rel="stylesheet" />
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js" type="text/javascript"></script>
+	<script src="lib/jQuery.TEGUtilities.min.js" type="text/javascript"></script>
+	<script src="../src/TEGFakePages.js" type="text/javascript"></script>
+	<script>
+		jQuery(document).ready(function() {
+			window.TEGForm = new TEGFakePages({
+				                                  formSelector           : '#myList',
+				                                  submitSelector         : '',
+				                                  pageItemParentSelector : '',
+				                                  pageLength             : 8,
+				                                  buttonPlacement        : TEGFakePages.BUTTON_BOTH,
+				                                  runValidation          : 'none',
+				                                  afterLoad              : () => { jQuery('#myList').show(); }
+			                                  });
+			// any additional stuff goes here
+		}); // end jQuery(document).ready
+	</script>
+</head>
+<body>
+<div id="myList">
+	<h1>Fake Pages On List</h1>
+	<p>For when a developer cannot alter the HTML content or when that content is just a repeating list of identical HTML structure.</p>
+	<div class="step">
+		<h2>First</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur dolorem ea ipsa neque repellendus, tenetur voluptas. Accusantium aliquid dolor esse exercitationem labore nobis officia quam quas ratione, saepe sint voluptate?</p>
+	</div>
+	<div class="step">
+		<h2>Second</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur dolorem ea ipsa neque repellendus, tenetur voluptas. Accusantium aliquid dolor esse exercitationem labore nobis officia quam quas ratione, saepe sint voluptate?</p>
+	</div>
+	<div class="step-exclude">This is excluded content.<br />
+		<h2 data-breadcrumb="User Info">Enter Your Email to Get Your Results</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Aliquid aut dolor esse et fugiat incidunt inventore ipsam laborum minus, nihil nulla officia omnis porro quibusdam quod ratione rem reprehenderit vel?</p>
+	</div>
+	<div class="step">
+		<h2>fourth included step after excluded step</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Asperiores at harum neque recusandae similique! Aliquam culpa nihil non nulla voluptatem, voluptatum. Animi aperiam cum dicta et fugit labore rem voluptatem?</p>
+	</div>
+	<div class="step">
+		<h2>Fifth</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur dolorem ea ipsa neque repellendus, tenetur voluptas. Accusantium aliquid dolor esse exercitationem labore nobis officia quam quas ratione, saepe sint voluptate?</p>
+	</div>
+	<div class="step">
+		<h2>Sixth</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur dolorem ea ipsa neque repellendus, tenetur voluptas. Accusantium aliquid dolor esse exercitationem labore nobis officia quam quas ratione, saepe sint voluptate?</p>
+	</div>
+	<div class="step">
+		<h2>Seventh</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Consequuntur dolorem ea ipsa neque repellendus, tenetur voluptas. Accusantium aliquid dolor esse exercitationem labore nobis officia quam quas ratione, saepe sint voluptate?</p>
+	</div>
+	<div class="step">
+		<h2>Section 8</h2>
+		<p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Est itaque nulla optio quas quidem quo sed sint sunt. A dignissimos facere illum inventore, libero minima nesciunt pariatur porro possimus sed.</p>
+	</div>
+	<div class="step">
+		<h2>Section 9</h2>
+		<p>Ea inventore iusto nulla numquam provident quia quisquam ratione tempore! Ab alias, autem dicta eum expedita explicabo impedit itaque laborum magni mollitia nesciunt odio qui, quos repellendus saepe sit suscipit.</p>
+	</div>
+	<div class="step">
+		<h2>Section 10</h2>
+		<p>Ab animi cumque ex, fuga harum laboriosam nemo quae! Asperiores delectus, dolor doloremque dolores eaque est eveniet exercitationem impedit iste iusto laborum libero magni nihil optio quibusdam, quidem sequi tempora.</p>
+	</div>
+	<div class="step">
+		<h2>Section 11</h2>
+		<p>At atque corporis culpa dicta eum, fugiat ipsa neque nihil numquam obcaecati optio perferendis, quis, reiciendis repellat saepe sint tempore totam. Corporis laborum laudantium, natus neque optio provident unde veniam.</p>
+	</div>
+	<div class="step">
+		<h2>Section 12</h2>
+		<p>Ad amet deleniti dolor doloremque dolores fuga iste magni nulla praesentium quam sequi tempora tempore, voluptatem? Alias aliquam aperiam impedit inventore itaque laborum libero, modi mollitia nam praesentium quaerat, rem.</p>
+	</div>
+	<div class="step">
+		<h2>Section 13</h2>
+		<p>Assumenda at atque culpa deserunt distinctio dolore illum, ipsa ipsum laudantium omnis optio placeat possimus, provident quia quos. Alias debitis deserunt fuga ipsum itaque magnam modi mollitia nobis quaerat suscipit.</p>
+	</div>
+	<div class="step">
+		<h2>Section 14</h2>
+		<p>Ab accusantium asperiores at perferendis sed! Ad aut et, labore laudantium nobis quos soluta sunt tenetur! Alias at consectetur consequuntur cumque debitis et exercitationem facere, laudantium nostrum provident quae quis?</p>
+	</div>
+	<div class="step">
+		<h2>Section 15</h2>
+		<p>Accusamus, eligendi eveniet necessitatibus nemo perspiciatis possimus quia totam velit? Aliquam aliquid aspernatur debitis delectus eligendi explicabo harum hic illo incidunt labore officiis quam, qui sapiente, sit tempore tenetur veritatis.</p>
+	</div>
+	<div class="step">
+		<h2>Section 16</h2>
+		<p>A aliquam, amet architecto assumenda consequuntur corporis debitis deserunt distinctio dolor earum error expedita id ipsam itaque laborum, minus modi mollitia nisi perspiciatis, possimus quidem recusandae repudiandae sequi ullam veritatis?</p>
+	</div>
+	<div class="step">
+		<h2>Section 17</h2>
+		<p>Dolore dolores doloribus eius fuga illum perspiciatis quaerat rem, tempora totam voluptas. Architecto consequatur cum deleniti dolorum, expedita ipsum magnam, magni maiores molestiae mollitia non odio omnis quibusdam sequi voluptate.</p>
+	</div>
+	<div class="step">
+		<h2>Section 18</h2>
+		<p>Atque cumque cupiditate dignissimos dolorum eos eveniet facilis fugit, impedit ipsum, magnam, magni nihil nobis officia quae qui? Est fugit inventore ipsam odio optio possimus quibusdam? Blanditiis corporis quo totam.</p>
+	</div>
+	<div class="step">
+		<h2>Section 19</h2>
+		<p>Cupiditate eaque excepturi ipsam nobis perferendis possimus quia. A, ab assumenda consequatur delectus deserunt esse exercitationem hic ipsam iste magni minus mollitia nulla omnis optio quae quis quo totam unde.</p>
+	</div>
+	<div class="step">
+		<h2>Section 20</h2>
+		<p>Dicta dolorum magnam odio? A aliquid animi asperiores atque, aut culpa dignissimos distinctio dolorem, doloremque dolores enim incidunt magnam molestias nam nesciunt nisi nostrum odit quae quaerat quasi quidem tempora?</p>
+	</div>
+	<div class="step">
+		<h2>Section 21</h2>
+		<p>Animi deleniti magni nobis numquam quae saepe. Aperiam autem cum debitis dignissimos dolor eum facilis ipsam modi nam neque nesciunt, sit. A adipisci ducimus id illo molestiae odit quis rem.</p>
+	</div>
+	<div class="step">
+		<h2>Section 22</h2>
+		<p>Assumenda consequatur deleniti dolorem doloremque dolores eligendi eveniet facilis harum ipsa magnam minima mollitia nemo nihil nostrum, nulla perferendis provident quae repudiandae suscipit totam ut vel velit veniam vitae voluptatum?</p>
+	</div>
+	<div class="step">
+		<h2>Section 23</h2>
+		<p>A accusantium aut consectetur debitis dolorem, dolores dolorum earum enim, fuga illo impedit incidunt inventore ipsam laboriosam laudantium maxime nostrum porro provident quam quia repellendus sunt, tempora temporibus vel voluptatem!</p>
+	</div>
+	<div class="step">
+		<h2>Section 24</h2>
+		<p>Ab, ad aliquam animi architecto assumenda at delectus dolor doloremque earum error, est excepturi impedit modi molestiae nam nostrum possimus quibusdam reiciendis repellat reprehenderit repudiandae sed unde vel voluptatem voluptatum?</p>
+	</div>
+	<div class="step">
+		<h2>Section 25</h2>
+		<p>Accusantium aliquam autem consequuntur culpa cupiditate, ducimus eius enim error est eveniet expedita harum in itaque magnam maxime modi natus neque odit quae sed sit temporibus vel veritatis vero voluptates?</p>
+	</div>
+	<div class="step">
+		<h2>Section 26</h2>
+		<p>Ab culpa laborum minima sunt. Accusantium aliquid cumque doloribus eius esse, eveniet fuga fugiat harum iure necessitatibus nesciunt nostrum nulla odit officia quos recusandae, repellendus saepe sunt unde voluptatem voluptatibus?</p>
+	</div>
+	<div class="step">
+		<h2>Section 27</h2>
+		<p>A alias autem commodi consequatur cum debitis deleniti eius eos est excepturi impedit maiores natus nihil, nostrum nulla, officia officiis omnis pariatur possimus provident repellendus reprehenderit, tempora temporibus vel voluptatem.</p>
+	</div>
+</div>
+</body>
+</html>

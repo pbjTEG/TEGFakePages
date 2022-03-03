@@ -68,7 +68,7 @@ describe('TEGFakePages', function() {
 			window.testForm.goPage(2, false);
 			window.testForm.nextPage(window.testEvent);
 			expect(window.testForm.newPageNumber).toBe(3);
-		}); // end newPageNumber should be 3
+		}); // end newPageNumber should be 2
 	}); // end describe('newPageNumber')
 
 	describe('lastPageNumber', function() {
