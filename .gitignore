@@ -22,6 +22,8 @@ dist
 *.tmp
 *.tmp.*
 *.dump
+/package-lock.json
+node_modules
 
 ### VisualStudioCode template
 .vscode/*

@@ -1,0 +1,22 @@
+{
+	"title": "TEG Fake Pages",
+	"name": "teg-fake-pages",
+	"fileName": "TEGFakePages",
+	"version": "v2.0",
+	"description": "Add fake pagination. ",
+	"main": "src/TegFakePages.js",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"author": "Paul B. Joiner <paulj@engageyourcause.com>",
+	"license": "MIT",
+	"devDependencies": {
+		"git-rev-sync": "^3.0.2",
+		"grunt": "^1.5.2",
+		"grunt-cli": "^1.4.3",
+		"grunt-contrib-copy": "^1.0.0",
+		"grunt-contrib-cssmin": "^4.0.0",
+		"grunt-contrib-uglify": "^5.2.1",
+		"load-grunt-tasks": "^5.1.0"
+	}
+}
