@@ -69,11 +69,11 @@ class TEGFakePages {
 			 */
 			breadcrumbItemMobile  :
 					jQuery('<div class="row"></div>')
-							.append('<div class="col-2 previous">&nbsp;</div>')
+							.append('<div class="col-2 previous" tabindex="0" aria-label="previous page">&nbsp;</div>')
 							.append('<div class="col title" />')
-							.append('<div class="col-2 next">&nbsp;</div>'),
-			breadcrumbItemTablet  : jQuery('<div class="col title"></div>'),
-			breadcrumbItemDesktop : jQuery('<div class="col title"></div>'),
+							.append('<div class="col-2 next" tabindex="0" aria-label="next page">&nbsp;</div>'),
+			breadcrumbItemTablet  : jQuery('<div class="col title" tabindex="0"></div>'),
+			breadcrumbItemDesktop : jQuery('<div class="col title" tabindex="0"></div>'),
 
 			// page button navigation
 			pageButtons    : jQuery('<div class="step-nav"/>'),
