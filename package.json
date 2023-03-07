@@ -2,7 +2,7 @@
 	"title": "TEG Fake Pages",
 	"name": "teg-fake-pages",
 	"fileName": "TEGFakePages",
-	"version": "v2.0",
+	"version": "v2.0.1",
 	"description": "Add fake pagination. ",
 	"main": "src/TegFakePages.js",
 	"scripts": {
