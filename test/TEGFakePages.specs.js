@@ -37,6 +37,17 @@ describe('TEGFakePages', function() {
 			errorSelector         : '.testError',
 			breadcrumbs           : jQuery('<div id="breadcrumbs" class="row"></div>'),
 			breadcrumbItemDesktop : jQuery('<div class="col title breadcrumbItem"></div>'),
+			pageChange :{
+				'1': {
+					beforeHide: (pageNumber, pageObject, fakePages) => {
+						// skip page two if green
+						if (document.querySelector('#radio213').checked) {
+							setTimeout(() => {fakePages.nextPage.call(fakePages)}, 100);
+						}
+						return true;
+					},
+				}
+			},
 			afterLoad             : function() {
 				return 'afterLoad() has run';
 			}
@@ -79,6 +90,7 @@ describe('TEGFakePages', function() {
 
 	describe('pageObjects', function() {
 		it('should have three objects', function() {
+			// noinspection JSUnresolvedVariable
 			expect(window.testForm.pageObjects.length).toBe(3);
 		}); // end pageObjects should be 3
 	}); // end describe('pageObjects')
@@ -185,4 +197,34 @@ describe('TEGFakePages', function() {
 			expect(window.testForm.currentPageObject.attr('id')).toBe('step2');
 		}); // end errorPage() should find the page with errors
 	}); // end describe('errorPage()')
+
+	describe('pageChange callbacks', function () {
+		it('should contain a custom entry', function () {
+			expect(typeof window.testForm.options.pageChange?.['1']?.beforeHide).toBe('function');
+		});
+		it('should contain the default "0" entry', function () {
+			expect(typeof window.testForm.options.pageChange?.['0']?.beforeHide).toBe('function');
+			expect(typeof window.testForm.options.pageChange?.['0']?.beforeShow).toBe('function');
+		});
+
+		describe('funcionality', function () {
+			beforeAll(() => {
+				spyOn(window.testForm.options.pageChange['1'], 'beforeHide').and.callThrough();
+				spyOn(window.testForm.options.pageChange['0'], 'beforeHide').and.callThrough();
+				spyOn(window.testForm.options.pageChange['0'], 'beforeShow').and.callThrough();
+				window.testForm.goPage(1, false);
+				document.querySelector('#radio213').click();
+				document.querySelector('#step0 button.step-next').click();
+			});
+			it('should run the "0" entries', function () {
+				expect(window.testForm.options.pageChange['0'].beforeHide).toHaveBeenCalled();
+				expect(window.testForm.options.pageChange['0'].beforeShow).toHaveBeenCalled();
+			});
+			it('should run the "1" entry', function () {
+				expect(window.testForm.options.pageChange['1'].beforeHide).toHaveBeenCalled();
+				expect(window.testForm.currentPageNumber).toBe(2);
+				expect(window.testForm.currentPageObject.is('#step1')).toBeTrue();
+			});
+		});
+	});
 }); // end describe('TEGFakePages')
