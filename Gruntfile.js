@@ -21,7 +21,6 @@ module.exports = function(grunt) {
 		                              '*   Date:    <%= grunt.template.today("yyyymmdd") %>\n' +
 		                              '*/\n',
 		                 postFix    : `_${thisTag}`,
-		                 postFixEN: `_${thisTag}`.replace(/\./g, '_'),
 		                 uglify     : {
 			                 options : {
 				                 banner    : '<%= banner %>',
@@ -46,20 +45,12 @@ module.exports = function(grunt) {
 						                 dest : 'dist/<%= pkg.fileName %><%= postFix %>.min.js',
 					                 },
 					                 {
-						                 src  : 'dist/<%= pkg.fileName %>.min.js',
-						                 dest : 'dist/<%= pkg.fileName %><%= postFixEN %>_min.js',
-					                 },
-					                 {
 						                 src  : 'dist/<%= pkg.fileName %>.min.js.map',
 						                 dest : 'dist/<%= pkg.fileName %><%= postFix %>.min.js.map',
 					                 },
 					                 {
 						                 src  : 'dist/<%= pkg.fileName %>.min.css',
 						                 dest : 'dist/<%= pkg.fileName %><%= postFix %>.min.css',
-					                 },
-					                 {
-						                 src  : 'dist/<%= pkg.fileName %>.min.css',
-						                 dest : 'dist/<%= pkg.fileName %><%= postFixEN %>_min.css',
 					                 }
 				                 ]
 			                 }
